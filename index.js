@@ -28,9 +28,27 @@ async function run() {
     await client.connect();
 
     const usersCollection = client.db('branShopDB').collection('users');
+    const bikesCollection = client.db('branShopDB').collection('bikes');
+
+    // Add product apis
+
+    
+
+    app.post('/bikes', async (req, res) => {
+        const bike = req.body;
+        const result = await bikesCollection.insertOne(bike);
+        res.send(result);
+    })
 
     //user related apis
-    
+
+    app.get('/users', async (req, res) => {
+        const cursor = await usersCollection.find();
+        const users = await cursor.toArray();
+        res.send(users);
+
+    })
+
     app.post('/users', async (req, res) => {
         const user = req.body;
         console.log(user);
