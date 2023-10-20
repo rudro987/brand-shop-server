@@ -52,6 +52,18 @@ async function run() {
         }
     });
 
+    app.get('/bikes/:brandName/:id', async (req, res) => {
+        const query = { _id: new ObjectId(req.params.id) };
+
+        try {
+            const result = await bikesCollection.findOne(query);
+            res.send(result);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Error while fetching products by product id' });
+        }
+  });
+
     app.post('/bikes', async (req, res) => {
         const bike = req.body;
         const isExist = await bikesCollection.findOne({ productName: bike.productName})
