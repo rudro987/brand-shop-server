@@ -31,19 +31,43 @@ async function run() {
     const bikesCollection = client.db('branShopDB').collection('bikes');
 
     // Add product apis
-
     
+    app.get('/bikes', async (req,res) => {
+        const cursor = bikesCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+
+    })
+
+    app.get('/bikes/:brandName', async (req, res) => {
+        const brandName = req.params.brandName;
+        const cursor = bikesCollection.find({ brandName: brandName });
+    
+        try {
+            const result = await cursor.toArray();
+            res.send(result);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Error while fetching products by brandName' });
+        }
+    });
 
     app.post('/bikes', async (req, res) => {
         const bike = req.body;
-        const result = await bikesCollection.insertOne(bike);
-        res.send(result);
+        const isExist = await bikesCollection.findOne({ productName: bike.productName})
+        if(!isExist){
+            const result = await bikesCollection.insertOne(bike);
+            res.send(result);
+        }else{
+            res.status(400).send({ message: 'This Bike already exists.' });
+        }
+        
     })
 
     //user related apis
 
     app.get('/users', async (req, res) => {
-        const cursor = await usersCollection.find();
+        const cursor = usersCollection.find();
         const users = await cursor.toArray();
         res.send(users);
 
