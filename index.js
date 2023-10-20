@@ -29,13 +29,18 @@ async function run() {
 
     const usersCollection = client.db('branShopDB').collection('users');
     const bikesCollection = client.db('branShopDB').collection('bikes');
+    const cartItemsCollection = client.db('branShopDB').collection('cartItems');
 
-    // Add product apis
+    // Add and display product apis
     
     app.get('/bikes', async (req,res) => {
         const cursor = bikesCollection.find();
-        const result = await cursor.toArray();
-        res.send(result);
+        try {
+            const result = await cursor.toArray();
+            res.send(result);
+        } catch (error) {
+            res.status(500).json({ message: 'Error while fetching all bikes'})
+        }
 
     })
 
@@ -47,7 +52,6 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         } catch (error) {
-            console.error(error);
             res.status(500).json({ message: 'Error while fetching products by brandName' });
         }
     });
@@ -59,8 +63,7 @@ async function run() {
             const result = await bikesCollection.findOne(query);
             res.send(result);
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Error while fetching products by product id' });
+            res.status(500).send({ message: 'Error while fetching products by product id' });
         }
   });
 
@@ -76,6 +79,31 @@ async function run() {
         
     })
 
+    // Add to cart and my cart apis
+
+    app.get("/my-cart", async (req, res) => {
+        const cursor = cartItemsCollection.find();
+        try {
+            const result = await cursor.toArray();
+            res.send(result);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: 'Error while fetching all bikes'})
+        }
+    })
+
+    app.post('/my-cart', async (req,res) => {
+        const cart = req.body;
+        console.log(cart);
+        try {
+            const result = await cartItemsCollection.insertOne(cart);
+            res.send(result);
+        } catch (error) {
+            res.status(400).send({ message: 'Error while adding to cart' });
+        }
+    
+    })
+
     //user related apis
 
     app.get('/users', async (req, res) => {
@@ -87,7 +115,6 @@ async function run() {
 
     app.post('/users', async (req, res) => {
         const user = req.body;
-        console.log(user);
         const result = await usersCollection.insertOne(user);
         res.send(result);
     })
