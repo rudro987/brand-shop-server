@@ -94,6 +94,16 @@ async function run() {
         res.status(500).send(error.message);
       }
     });
+    app.get("/my-cart/:id", async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        try {
+          const result = await cartItemsCollection.findOne(query);
+          res.send(result);
+        } catch (error) {
+          res.status(500).send(error.message);
+        }
+      });
 
     app.post("/my-cart", async (req, res) => {
       const cart = req.body;
@@ -104,6 +114,46 @@ async function run() {
         res.status(400).send(error.message);
       }
     });
+
+    // update product apis
+
+    app.get("/updateProducts/:id", async (req,res) => {
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)};
+        try {
+            const result = await bikesCollection.findOne(query);
+            res.send(result);
+        } catch (error) {
+            res.send(error.message);
+        }
+
+    })
+
+    app.put('/updateProducts/:id', async (req,res) => {
+        try {
+            const id = req.params.id;
+            const filter = {_id: new ObjectId(id)};
+            const options = { upsert: true };
+            const updatedProduct = req.body;
+            const product = {
+                $set: {
+                    productName: updatedProduct.productName,
+                    brandName: updatedProduct.brandName,
+                    image: updatedProduct.image,
+                    type: updatedProduct.type,
+                    price: updatedProduct.price,
+                    description: updatedProduct.description,
+                    rating: updatedProduct.rating
+                    
+                }
+            }
+            const result = await bikesCollection.updateOne(filter, product, options);
+            res.send(result);
+        }
+         catch (error) {
+            res.send(error.message)
+        }
+    })
 
     //user related apis
 
