@@ -27,9 +27,33 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const brandNameCollection = client.db("branShopDB").collection('brands');
     const usersCollection = client.db("branShopDB").collection("users");
     const bikesCollection = client.db("branShopDB").collection("bikes");
     const cartItemsCollection = client.db("branShopDB").collection("cartItems");
+
+
+     // Add and display brand apis
+
+    app.get("/addBrands", async (req, res) => {
+      const cursor = brandNameCollection.find();
+      try {
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        res.status(500).send(error.message);
+      }
+    })
+
+    app.post('/addBrands', async (req, res) => {
+      const brands = req.body;
+      try {
+        const result = await brandNameCollection.insertOne(brands);
+        res.send(result);
+      } catch (error) {
+        res.status(400).send(error.message);
+      }
+    })
 
     // Add and display product apis
 
@@ -82,6 +106,7 @@ async function run() {
         res.send(error.message);
       }
     });
+
 
     // Add to cart and my cart apis
 
