@@ -44,7 +44,7 @@ async function run() {
         res.status(500).send(error.message);
       }
     })
-
+    
     app.post('/addBrands', async (req, res) => {
       const brands = req.body;
       try {
